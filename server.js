@@ -196,4 +196,4 @@ if (require.main === module) {
   startGameServer(server);
 }
 
-module.exports = app;
+module.exports = { app, startGameServer };
