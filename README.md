@@ -11,6 +11,19 @@ npm start
 
 Then open `http://localhost:3000` in two different browsers or devices on the same network.
 
+## Deploying to Vercel
+
+This project is configured to deploy as a Vercel Node function. After pushing to a Git repository, import the project in Vercel and deploy.
+
+To run locally with Vercel:
+
+```bash
+npm install
+npx vercel dev
+```
+
+The app will be available at the URL printed by the Vercel CLI.
+
 ## Controls
 
 - Player 1 (left paddle): **W / S**
