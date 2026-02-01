@@ -30,3 +30,9 @@ The app will be available at the URL printed by the Vercel CLI.
 
 - Player 1 (left paddle): **W / S**
 - Player 2 (right paddle): **Arrow Up / Arrow Down**
+
+## Gameplay
+
+- First to 7 points wins the round.
+- Ball speed increases after each paddle hit.
+- A short countdown plays before each serve and after a win.

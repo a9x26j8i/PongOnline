@@ -78,7 +78,13 @@ const connect = () => {
       state = message;
       leftScoreEl.textContent = state.scores[0];
       rightScoreEl.textContent = state.scores[1];
-      if (!state.running) {
+      if (state.phase === "gameover") {
+        const winnerLabel = state.winner === 0 ? "Player 1" : "Player 2";
+        updateStatus(`${winnerLabel} wins!`);
+      } else if (state.phase === "countdown") {
+        const countdownText = typeof state.countdown === "number" ? `Starting in ${state.countdown}` : "Get ready...";
+        updateStatus(countdownText);
+      } else if (!state.running) {
         updateStatus("Waiting for opponent...");
       } else {
         updateStatus("Game on!");
@@ -184,7 +190,18 @@ const draw = () => {
     context.fillStyle = "rgba(255, 255, 255, 0.5)";
     context.font = "24px sans-serif";
     context.textAlign = "center";
-    context.fillText("Waiting for opponent", GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+    if (state.phase === "gameover") {
+      const winnerLabel = state.winner === 0 ? "Player 1 Wins!" : "Player 2 Wins!";
+      context.fillText(winnerLabel, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+      context.font = "16px sans-serif";
+      context.fillText("Next round starting soon...", GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10);
+    } else if (state.phase === "countdown") {
+      const countdownText =
+        typeof state.countdown === "number" ? `Starting in ${state.countdown}` : "Get ready...";
+      context.fillText(countdownText, GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+    } else {
+      context.fillText("Waiting for opponent", GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20);
+    }
   }
 
   requestAnimationFrame(draw);
