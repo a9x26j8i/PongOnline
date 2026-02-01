@@ -13,7 +13,9 @@ Then open `http://localhost:3000` in two different browsers or devices on the sa
 
 ## Deploying to Vercel
 
-This project is configured to deploy as a Vercel Node function. After pushing to a Git repository, import the project in Vercel and deploy.
+Vercel Serverless Functions do not keep long-lived WebSocket connections alive. You can still deploy the static client on Vercel, but you must point it at a separate WebSocket host (Render/Fly/Railway/your own server).
+
+You can set the WebSocket URL by adding a `?ws=wss://your-ws-host` query string to the page URL or by defining `window.PONG_WS_URL` before loading `client.js`.
 
 To run locally with Vercel:
 

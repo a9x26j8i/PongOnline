@@ -24,52 +24,90 @@ let state = {
 };
 
 const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-const wsUrl = `${wsProtocol}://${window.location.host}`;
-const socket = new WebSocket(wsUrl);
+const searchParams = new URLSearchParams(window.location.search);
+const configuredWsUrl =
+  window.PONG_WS_URL ||
+  searchParams.get("ws") ||
+  `${wsProtocol}://${window.location.host}`;
+
+let socket = null;
+let reconnectTimer = null;
+const reconnectDelayMs = 1500;
 
 const updateStatus = (message) => {
   statusEl.textContent = message;
 };
 
-socket.addEventListener("open", () => {
-  updateStatus("Waiting for opponent...");
-});
+const scheduleReconnect = () => {
+  if (reconnectTimer) {
+    return;
+  }
+  reconnectTimer = window.setTimeout(() => {
+    reconnectTimer = null;
+    connect();
+  }, reconnectDelayMs);
+};
 
-socket.addEventListener("message", (event) => {
-  const message = JSON.parse(event.data);
-
-  if (message.type === "assign") {
-    playerIndex = message.index;
-    updateStatus("Assigned paddle. Waiting for opponent...");
+const connect = () => {
+  if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
     return;
   }
 
-  if (message.type === "full") {
-    updateStatus("Room is full. Try again later.");
-    return;
-  }
+  updateStatus("Connecting...");
+  socket = new WebSocket(configuredWsUrl);
 
-  if (message.type === "state") {
-    state = message;
-    leftScoreEl.textContent = state.scores[0];
-    rightScoreEl.textContent = state.scores[1];
-    if (!state.running) {
-      updateStatus("Waiting for opponent...");
-    } else {
-      updateStatus("Game on!");
+  socket.addEventListener("open", () => {
+    updateStatus("Waiting for opponent...");
+  });
+
+  socket.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+
+    if (message.type === "assign") {
+      playerIndex = message.index;
+      updateStatus("Assigned paddle. Waiting for opponent...");
+      return;
     }
-  }
-});
 
-socket.addEventListener("close", () => {
-  updateStatus("Disconnected. Refresh to reconnect.");
-});
+    if (message.type === "full") {
+      updateStatus("Room is full. Try again later.");
+      return;
+    }
+
+    if (message.type === "state") {
+      state = message;
+      leftScoreEl.textContent = state.scores[0];
+      rightScoreEl.textContent = state.scores[1];
+      if (!state.running) {
+        updateStatus("Waiting for opponent...");
+      } else {
+        updateStatus("Game on!");
+      }
+    }
+  });
+
+  socket.addEventListener("close", () => {
+    updateStatus("Disconnected. Reconnecting...");
+    scheduleReconnect();
+  });
+
+  socket.addEventListener("error", () => {
+    updateStatus("Connection error. Reconnecting...");
+    scheduleReconnect();
+  });
+};
+
+connect();
 
 const sendDirection = (direction) => {
   if (currentDirection === direction) {
     return;
   }
   currentDirection = direction;
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+
   socket.send(
     JSON.stringify({
       type: "input",
@@ -102,12 +140,20 @@ const getDirectionFromKeys = () => {
   return 0;
 };
 
+const scrollKeys = new Set(["ArrowUp", "ArrowDown"]);
+
 window.addEventListener("keydown", (event) => {
+  if (scrollKeys.has(event.code)) {
+    event.preventDefault();
+  }
   keyState.add(event.code);
   sendDirection(getDirectionFromKeys());
 });
 
 window.addEventListener("keyup", (event) => {
+  if (scrollKeys.has(event.code)) {
+    event.preventDefault();
+  }
   keyState.delete(event.code);
   sendDirection(getDirectionFromKeys());
 });
