@@ -1,0 +1,100 @@
+:root {
+  color-scheme: dark;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0f1115;
+  color: #f5f7ff;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  gap: 24px;
+  padding: 32px 20px 48px;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.header h1 {
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: #cdd3e0;
+  margin: 0;
+}
+
+.game {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+}
+
+canvas {
+  border-radius: 12px;
+  background: linear-gradient(160deg, #1b1f2a, #0a0b10);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+}
+
+.status {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  padding: 8px 14px;
+  background: rgba(18, 22, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: #fdf1b6;
+}
+
+.scoreboard {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  color: #f5f7ff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.instructions {
+  background: #171a22;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.instructions h2 {
+  margin-top: 0;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #cdd3e0;
+}
+
+@media (max-width: 900px) {
+  canvas {
+    width: 100%;
+    height: auto;
+  }
+
+  .status,
+  .scoreboard {
+    position: static;
+    align-self: center;
+  }
+}
